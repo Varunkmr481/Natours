@@ -1,18 +1,23 @@
-// Import the Express module. 
+// Import the Express module ,fs module 
 const express = require('express');
+const fs = require('fs');
 
 // Create an instance of an Express application.
 const app = express();
 
-// Define a route for GET requests to the root URL ('/').
-app.get('/',(req,res)=>{
-    res.status(200).json({message : 'Hi from backened!' , app : 'Natour App'})
+// Read and parse the tours data from the JSON file.
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
+
+// Define a route for GET requests to '/api/v1/tours'.
+app.get('/api/v1/tours',(req,res)=>{
+    res.status(200).json({
+        status : 'success',
+        data : {
+            tours  
+        }
+    })
 })
 
-// Define a route for POST requests to the root URL ('/').
-app.post('/',(req,res)=>{
-    res.send("Post Request ...");
-})
 
 // Define the port number on which the server will listen.
 const port = 3000;
