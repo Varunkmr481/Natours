@@ -1,19 +1,36 @@
 const express = require('express');
 const fs = require('fs');
 const app = express();
+const morgan = require('morgan');
 
-// Middleware to parse incoming JSON requests.
+// MIDDLEWARES
+app.use(morgan('dev'));
+
 app.use(express.json());
+
+app.use((req,res,next)=>{
+  console.log('Hello from the middleware 😎');
+  next();
+})
+
+app.use((req,res,next)=>{
+  req.requestedTime = new Date().toISOString();
+  next();
+})
+
 
 // Read and parse the tours data from the JSON file.
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-
+//ROUTE HANDLERS
 const getAllTours = (req, res) => {
+  console.log(req.requestedTime);
+
   res.status(200).json({
     status: 'success',
+    requestedTime : req.requestedTime ,
     data: {
       tours,
     },
@@ -94,6 +111,41 @@ const deleteTour = (req, res) => {
   });
 };
 
+const getAllUsers = (req,res)=>{
+  res.status(500).json({
+    status : 'ERROR',
+    message : "This route is not yet implemented!"
+  })
+}
+
+const createUser = (req,res)=>{
+  res.status(500).json({
+    status : 'ERROR',
+    message : "This route is not yet implemented!"
+  })
+}
+
+const getUser = (req,res)=>{
+  res.status(500).json({
+    status : 'ERROR',
+    message : "This route is not yet implemented!"
+  })
+}
+
+const updateUser = (req,res)=>{
+  res.status(500).json({
+    status : 'ERROR',
+    message : "This route is not yet implemented!"
+  })
+}
+
+const deleteUser = (req,res)=>{
+  res.status(500).json({
+    status : 'ERROR',
+    message : "This route is not yet implemented!"
+  })
+}
+
 
 // Define a route for GET requests to '/api/v1/tours' and '/api/v1/tours/:id'..
 // POST a new tour , update a new Tour , delete Tour
@@ -108,8 +160,18 @@ app
   .patch(updateTour)
   .delete(deleteTour);
 
+  app
+  .route('/api/v1/users')
+  .get(getAllUsers)
+  .post(createUser);
 
-//server start
+  app.
+  route('/api/v1/users/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
+
+// SERVER START
 const port = 3000;
 app.listen(port, () => {
   console.log(`App running on port Number : ${port}`);
