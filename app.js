@@ -149,27 +149,33 @@ const deleteUser = (req,res)=>{
 
 // Define a route for GET requests to '/api/v1/tours' and '/api/v1/tours/:id'..
 // POST a new tour , update a new Tour , delete Tour
-app
-  .route('/api/v1/tours')
+const tourRouter = express.Router();
+const userRouter = express.Router();
+
+tourRouter
+  .route('/')
   .get(getAllTours)
   .post(createTour);
 
-app
-  .route('/api/v1/tours/:id')
+tourRouter
+  .route('/:id')
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
 
-  app
-  .route('/api/v1/users')
+  userRouter
+  .route('/')
   .get(getAllUsers)
   .post(createUser);
 
-  app.
-  route('/api/v1/users/:id')
+  userRouter
+  .route('/:id')
   .get(getUser)
   .patch(updateUser)
   .delete(deleteUser);
+
+  app.use('/api/v1/tours',tourRouter);
+  app.use('/api/v1/users',userRouter);
 
 // SERVER START
 const port = 3000;
