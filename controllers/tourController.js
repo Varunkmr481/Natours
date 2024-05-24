@@ -20,6 +20,22 @@ exports.checkID = (req,res,next,val) => {
   next();
 }
 
+exports.checkBody = (req,res,next)=>{
+  // console.log(req.body);
+  
+  // const {name , price} = req.body;
+  // console.log(name);
+
+  if(!req.body.name || !req.body.price){
+    return res.status(400).json({
+      status : 'fail',
+      message : "name and price are required fields"
+    })
+  }
+
+  next();
+}
+
 
 exports.getAllTours = (req, res) => {
     console.log(req.requestedTime);
