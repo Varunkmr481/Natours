@@ -118,9 +118,5 @@ exports.deleteTour = async (req, res) => {
       message : err
     })
   }
-    res.status(204).json({
-      status: 'success',
-      data: null,
-    });
   };
 
