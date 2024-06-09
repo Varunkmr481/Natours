@@ -10,9 +10,12 @@ router.use(express.json());
 // router.param('id',tourController.checkID);
 
 router
+.route('/tour-stats')
+.get(tourController.getTourStats);
+
+router
 .route('/top-5-cheap')
 .get(tourController.aliasTopTours , tourController.getAllTours);
-
 
 router
   .route('/')
@@ -25,4 +28,5 @@ router
   .patch(tourController.updateTour)
   .delete(tourController.deleteTour);
 
+  
 module.exports = router;

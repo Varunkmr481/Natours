@@ -1,11 +1,6 @@
 const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
 
-// Read and parse the tours data from the JSON file.
-// const tours = JSON.parse(
-//     fs.readFileSync(`${__dirname}/./../dev-data/data/tours-simple.json`)
-//   );
-
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingAverage,price';
@@ -18,51 +13,6 @@ exports.aliasTopTours = (req, res, next) => {
 
 exports.getAllTours = async (req, res) => {
   try {
-    //BUILD QUERY
-
-    // 1.1 Basic Filtering
-    // const queryObj = {...req.query};
-    // const excludedFields = ['page' , 'sort' , 'limit' , 'fields'];
-    // excludedFields.forEach(el => delete queryObj[el] );
-    // console.log(req.query , queryObj);
-
-    // 1.2 Advanaced filtering
-    // let queryStr = JSON.stringify(queryObj);
-    // queryStr = queryStr.replace(/\b(gt|gte|lte|lt)\b/g, function(match){return `$${match}`});
-    // console.log(JSON.parse(queryStr));
-
-    // let query = Tour.find(JSON.parse(queryStr));
-
-    // 2. Sorting
-    // if(req.query.sort){
-    // const sortBy = req.query.sort.split(',').join(' ');
-    // query = query.sort(sortBy);
-    // }else{
-    //changed -createdAt to _id due to improper pagination results
-    //   query = query.sort('_id');
-    // }
-
-    // 3) Field Limiting
-    // if(req.query.fields){
-    //   let fields = req.query.fields.split(',').join(' ');
-    //   query = query.select(fields)
-    // }else{
-    //   query = query.select('-__v');
-    // }
-
-    // 4) Pagination
-    // const page = req.query.page * 1 || 1 ;
-    // const limit = req.query.limit * 1 || 100 ;
-    // const skip = (page - 1) * limit;
-
-    // query = query.skip(skip).limit(limit);
-
-    // if(req.query.page){
-    //   const numTours = await Tour.countDocuments();
-    //   if(skip >= numTours) throw new Error("This page does not exists!");
-    // }
-
-    // 5) Aliasing
 
     //EXECUTE QUERY
     // console.log(query);
@@ -168,3 +118,48 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
+
+
+exports.getTourStats = async(req,res)=>{
+  try{
+    const stats = await Tour.aggregate([
+      {
+        $match : { ratingAverage : { $gte : 4.5 } },
+      },
+      {
+        $group : {
+          _id : { $toUpper : "$difficulty" } ,
+          numTours : { $sum : 1 },
+          numRatings : { $sum : "$ratingQuantity" },
+          avgRating : { $avg : "$ratingAverage" },
+          avgPrice : { $avg : "$price" },
+          minPrice : { $min : "$price"},
+          maxPrice : { $max : "$price" }
+        },
+      },
+      {
+        $sort : {
+          avgPrice : 1
+        }
+      },
+      // {
+      //   $match : { _id : { $ne : "EASY"}}
+      // }  
+    ])
+
+    // console.log(stats);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        stats,
+      },
+    });
+
+  }catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+}
