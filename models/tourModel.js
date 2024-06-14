@@ -70,7 +70,7 @@ const tourSchema = mongoose.Schema({
     return this.duration/7;
   })
 
-  //Document middleware : runs before .save() & .create()
+  //DOCUMENT MIDDLEWARE : RUNS BEFORE .save() & .create()
   tourSchema.pre('save' , function(next){
     // console.log(this);
     this.slug = slugify(this.name, {lower : true});
@@ -88,10 +88,11 @@ const tourSchema = mongoose.Schema({
   //   next();
   // })
 
-  //Query Middleware for words starting with find 
+  //QUERY MIDDLEWARE FOR METHODS STARTING WITH FIND
   tourSchema.pre(/^find/, function(next){
     // tourSchema.pre('find', function(next){
       this.find({ secretTour : { $ne : true } });
+      // console.log(this);
       this.start = Date.now();
       next();
     })
@@ -100,6 +101,12 @@ const tourSchema = mongoose.Schema({
   tourSchema.post(/^find/,function(docs,next){
     console.log(`Query took ${Date.now()-this.start} milliseconds`);
     console.log(docs);
+    next();
+  })
+
+  //AGGREGATION MIDDLEWARE
+  tourSchema.pre('aggregate',function(next){
+    console.log(this.pipeline().unshift({ $match : { secretTour : { $ne : true } } }));
     next();
   })
 
