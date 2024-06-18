@@ -40,6 +40,6 @@ app.all('*',(req,res,next)=>{
 })
 
 //GLOBAL ERROR HANDLING MIDDLEWARE
-app.use(globalErrorHandler(err,req,res,next));
+app.use(globalErrorHandler);
    
 module.exports = app ;
