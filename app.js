@@ -3,6 +3,8 @@ const app = express();
 const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const AppError = require("./utils/appError");
+const globalErrorHandler = require('./controllers/errorController');
 
 // MIDDLEWARES
 if(process.env.NODE_ENV === 'development'){
@@ -12,10 +14,10 @@ if(process.env.NODE_ENV === 'development'){
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
-app.use((req,res,next)=>{
-  console.log('Hello from the middleware 😎');
-  next();
-})
+// app.use((req,res,next)=>{
+//   console.log('Hello from the middleware 😎');
+//   next();
+// })
 
 app.use((req,res,next)=>{
   req.requestedTime = new Date().toISOString();
@@ -27,32 +29,17 @@ app.use('/api/v1/users',userRouter);
 
 //UNHANDLED REQUESTS
 app.all('*',(req,res,next)=>{
-  // res.status(404).json({
-    // status : 'fail',
-    // message : `Can't find ${req.originalUrl} on this server`
-  // })
 
-  const err = new Error(`Can't find ${req.originalUrl} on this server`);
-  err.status = 'fail';
-  err.statusCode = 404 ;
+  // const err = new Error(`Can't find ${req.originalUrl} on this server`);
+  // err.status = 'fail';
+  // err.statusCode = 404 ;
 
-  next(err);
+  const err1 = new AppError(`Can't find ${req.originalUrl} on this server!`,404);
+  console.log(err1);
+  next(err1);
 })
 
 //GLOBAL ERROR HANDLING MIDDLEWARE
-app.use((err,req,res,next)=>{
-  err.statusCode = err.statusCode || 500 ;
-  err.status = err.status ;
-
-  res.status(err.statusCode).json({
-    status : err.status,
-    message : err.message     
-  })
-})
-
+app.use(globalErrorHandler(err,req,res,next));
+   
 module.exports = app ;
-
-
- 
-
-
