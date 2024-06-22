@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Varunkmr481/Natours-project#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongoose": "^5.13.22",
