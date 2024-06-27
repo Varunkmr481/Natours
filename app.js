@@ -21,6 +21,7 @@ app.use(express.static(`${__dirname}/public`));
 
 app.use((req,res,next)=>{
   req.requestedTime = new Date().toISOString();
+  // console.log(req.headers);
   next();
 })
 
@@ -35,7 +36,7 @@ app.all('*',(req,res,next)=>{
   // err.statusCode = 404 ;
 
   const err1 = new AppError(`Can't find ${req.originalUrl} on this server!`,404);
-  console.log(err1);
+  // console.log(err1);
   next(err1);
 })
 

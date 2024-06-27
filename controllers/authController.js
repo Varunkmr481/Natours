@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require('jsonwebtoken');
@@ -15,7 +16,8 @@ exports.signup = catchAsync( async (req,res,next) => {
         name : req.body.name,
         email : req.body.email,
         password : req.body.password,
-        confirmPassword : req.body.confirmPassword
+        confirmPassword : req.body.confirmPassword,
+        passwordChangedAt : req.body.passwordChangedAt
     });
 
     // console.log(process.env.JWT_EXPIRES_IN);
@@ -42,9 +44,6 @@ exports.login = catchAsync( async (req,res,next) => {
 
     // 2) Check if user exists & password is correct
     const user = await User.findOne({email : email}).select('+password'); 
-    // const correct = user.correctPassword(password,user.password);
-    
-    // console.log(user);
 
     if(!user || !(await user.correctPassword(password,user.password)) ){
         return next(new AppError("Incorrect email or password!",401));
@@ -59,3 +58,38 @@ exports.login = catchAsync( async (req,res,next) => {
         token
     })
 })
+
+exports.protect = catchAsync(async (req,res,next)=>{
+    let token;
+
+    // 1) Getting token & check if it's there
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+    {
+        token = req.headers.authorization.split(' ')[1];
+    }
+
+    // console.log(token);
+
+    if(!token){
+        return next(new AppError('You are not logged In ! Please log In to get access',401));
+    }
+
+    // 2) Verfication token
+    const decoded = await promisify(jwt.verify)(token,process.env.JWT_SECRET);
+    console.log(decoded);
+
+    // 3) Check if user still exists
+    const freshUser = await User.findById(decoded.id);
+    if(!freshUser){
+        return next(new AppError('The user belonging to this token no longer exists!',401));
+    }
+
+    // 4) Check if user changed password after the token was issued 
+    if(freshUser.changedPasswordAfter(decoded.iat)){
+        return next(new AppError("User recently Changed password ! Please log in again.",401));
+    };
+
+    //GRANT ACCESS TO USER
+    req.user = freshUser ;
+    next();
+});
