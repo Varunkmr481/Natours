@@ -17,7 +17,8 @@ exports.signup = catchAsync( async (req,res,next) => {
         email : req.body.email,
         password : req.body.password,
         confirmPassword : req.body.confirmPassword,
-        passwordChangedAt : req.body.passwordChangedAt
+        passwordChangedAt : req.body.passwordChangedAt,
+        role : req.body.role
     });
 
     // console.log(process.env.JWT_EXPIRES_IN);
@@ -93,3 +94,15 @@ exports.protect = catchAsync(async (req,res,next)=>{
     req.user = freshUser ;
     next();
 });
+
+
+exports.restrictTo = (...roles) => {
+    return (req , res , next) => {
+        // roles : ['admin','lead-guide'] , req.user.role = 'user'
+        if(!roles.includes(req.user.role)){
+            return next(new AppError("You do not have the permission to perform this action ",403));
+        }
+        
+        next();
+    }
+}
