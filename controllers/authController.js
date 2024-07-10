@@ -197,3 +197,4 @@ exports.updatePassword = catchAsync(async (req,res,next)=>{
     // 4) Log user in , send jwt
     createSendToken(user , 200 , res);   
 })
+
