@@ -7,13 +7,19 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const AppError = require("./utils/appError");
 const globalErrorHandler = require('./controllers/errorController');
+const helmet = require('helmet');
 
 // 1) GLOBAL MIDDLEWARES
 
+// Set security http header
+app.use(helmet());
+
+// Development logging 
 if(process.env.NODE_ENV === 'development'){
   app.use(morgan('dev'));
 }
 
+// Limit requests from the same api
 const limiter = rateLimit({
   max : 100,
   windowMS : 60 * 60 * 1000,
@@ -22,20 +28,28 @@ const limiter = rateLimit({
 
 app.use("/api",limiter);
 
-app.use(express.json());
+// Body parser , reading data from the body into req.body
+app.use(express.json({
+  limit : '10kb'
+}));
+
+// Serving static files
 app.use(express.static(`${__dirname}/public`));
 
+// Test middleware 1
 // app.use((req,res,next)=>{
 //   console.log('Hello from the middleware 😎');
 //   next();
 // })
 
+// Test middleware 2
 app.use((req,res,next)=>{
   req.requestedTime = new Date().toISOString();
   // console.log(req.headers);
   next();
 })
 
+// 2) ROUTES
 app.use('/api/v1/tours',tourRouter);
 app.use('/api/v1/users',userRouter);
 
