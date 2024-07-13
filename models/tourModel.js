@@ -3,7 +3,7 @@ const slugify = require('slugify');
 const validator = require('validator');
 const User = require('./userModel.js')
 
-const tourSchema = mongoose.Schema({
+const tourSchema = new mongoose.Schema({
     name : {
       type : String ,
       required : [true,"A tour must have a name!"],   //validator  
