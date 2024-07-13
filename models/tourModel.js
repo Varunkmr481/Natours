@@ -152,7 +152,18 @@ const tourSchema = mongoose.Schema({
       // console.log(this);
       this.start = Date.now();
       next();
-    })
+    });
+  
+  // Auto-populate 'guides' in tour docs, excluding '__v' and 'passwordChangedAt', 
+  // before 'find' queries.  
+  tourSchema.pre(/^find/, function(next){
+    this.populate({
+      path : 'guides',
+      select : "-__v -passwordChangedAt"
+    });
+    
+    next();
+  });
 
 
   tourSchema.post(/^find/,function(docs,next){
