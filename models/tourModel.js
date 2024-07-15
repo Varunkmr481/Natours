@@ -121,6 +121,13 @@ const tourSchema = new mongoose.Schema({
     return this.duration/7;
   })
 
+  // virtual populate
+  tourSchema.virtual('reviews',{
+    ref : 'Review',
+    foreignField : 'tour',
+    localField : '_id'
+  });
+
   //DOCUMENT MIDDLEWARE : RUNS BEFORE .save() & .create()
   tourSchema.pre('save' , function(next){
     // console.log(this);
