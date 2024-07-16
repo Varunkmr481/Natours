@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require("../utils/appError");
+const factory = require('./handlerFactory');
 
 // allowedFields here is ['name','email'] 
 
@@ -84,9 +85,4 @@ exports.updateUser = (req,res)=>{
     })
   }
   
-exports.deleteUser = (req,res)=>{
-    res.status(500).json({
-      status : 'ERROR',
-      message : "This route is not yet implemented!"
-    })
-  }
+exports.deleteUser = factory.deleteOne(User);
