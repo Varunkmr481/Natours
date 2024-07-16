@@ -8,7 +8,9 @@ router.use(express.json());
 router.route('/').get(reviewController.getAllReviews);
 
 // POST /tour/1234efc/reviews
+// GET /tour/1234efc/reviews
 // POST /reviews
+// GET /reviews
 
 router
   .route('/')
