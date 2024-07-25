@@ -186,10 +186,10 @@ const tourSchema = new mongoose.Schema({
   })
 
   //AGGREGATION MIDDLEWARE
-  tourSchema.pre('aggregate',function(next){
+  // tourSchema.pre('aggregate',function(next){
     // console.log(this.pipeline().unshift({ $match : { secretTour : { $ne : true } } }));
-    next();
-  })
+  //   next();
+  // })
 
   const Tour = mongoose.model('Tour',tourSchema);
 
