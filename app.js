@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp')
+const cookieParser = require('cookie-parser');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -26,6 +27,21 @@ app.use(express.static(path.join(__dirname , 'public')));
 // Set security http header
 app.use(helmet());
 
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      scriptSrc: ["'self'", 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js'],
+      objectSrc: ["'none'"],
+      styleSrc: ["'self'", 'https:', 'unsafe-inline'],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
+
+
 // Development logging 
 if(process.env.NODE_ENV === 'development'){
   app.use(morgan('dev'));
@@ -44,6 +60,9 @@ app.use("/api",limiter);
 app.use(express.json({
   limit : '10kb'
 }));
+
+// Cookie Parser , parses the data from the cookie
+app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -72,10 +91,10 @@ app.use(
 //   next();
 // })
 
-// Test middleware 2
+// Test middleware 2 (logs cookies)
 app.use((req,res,next)=>{
   req.requestedTime = new Date().toISOString();
-  // console.log(req.headers);
+  console.log(req.cookies);
   next();
 })
 
