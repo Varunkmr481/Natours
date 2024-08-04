@@ -4,10 +4,6 @@ node_modules/
 # Environment configuration
 config.env
 
-# Logs
-logs/
-*.log
-
 # Runtime data
 pids/
 *.pid
@@ -48,3 +44,18 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Parcel cache
+.cache/
+
+# Build files
+public/js/bundle.js
+public/js/bundle.js.map
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# System files
+.DS_Store
