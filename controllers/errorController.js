@@ -27,35 +27,64 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message,400);
 }
 
-const sendErrorDev = (err,res) => {
-  res.status(err.statusCode).json({
-    status : err.status,
-    message : err.message,
-    error : err , 
-    stack : err.stack
-  })
-}
-
-//operational , trusted errors : send message to client
-const sendErrorProd = (err,res) => {
-  if(err.isOperational){
-    res.status(err.statusCode).json({
-      status : err.status,
-      message : err.message
-    })
+const sendErrorDev = (err, req, res) => {
+  // A) For API
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+      error: err,
+      stack: err.stack,
+    });
   }
+  
+  // B) For Rendered Website
+  console.log('Error : ', err);
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went Wrong!',
+    msg: err.message,
+  });
+};
 
-  //programming or any unknown error : don't leak error details
-  else{
-    // 1) Log error
-    console.log('Error : ' , err);
+const sendErrorProd = (err, req, res) => {
+  // A) API
+  if (req.originalUrl.startsWith('/api')) {
+    // 1) Operational , trusted errors : send message to client
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    }
+
+    // 2) Programming or any unknown error : don't leak error details
+    // Log error
+    console.log('Error : ', err);
 
     res.status(500).json({
-      status : 'error' ,
-      message : 'Something went very wrong !'
-    })
+      status: 'error',
+      message: 'Something went very wrong !',
+    });
   }
-}
+
+  // B) RENDERED WEBSITE
+  // 1) Operational , trusted errors : send message to client
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went Wrong!',
+      msg: err.message,
+    });
+  }
+  // 2) Programming or any unknown error : don't leak error details
+
+  // Log error
+  console.log('Error : ', err);
+
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went Wrong!',
+    msg: 'Please Try Again Later!',
+  });
+};
 
 module.exports = (err,req,res,next)=>{
 
@@ -63,11 +92,12 @@ module.exports = (err,req,res,next)=>{
     err.status = err.status || 'error';
 
     if(process.env.NODE_ENV === 'development'){
-      sendErrorDev(err,res);
+      sendErrorDev(err,req,res);
     }
     else if(process.env.NODE_ENV === 'production'){
       let error = {...err};
       error.name = err.name;
+      error.message = err.message;
 
       if(error.name === 'CastError'){
         error = handleCastErrorDB(error);
@@ -89,6 +119,6 @@ module.exports = (err,req,res,next)=>{
         error = handleJwtTokenExpiredError(error);
       }
 
-      sendErrorProd(error,res);
+      sendErrorProd(error,req,res);
     }
     }
