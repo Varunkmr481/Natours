@@ -112,8 +112,10 @@ exports.protect = catchAsync(async (req,res,next)=>{
         return next(new AppError("User recently Changed password ! Please log in again.",401));
     };
 
-    //GRANT ACCESS TO USER
+    //GRANT ACCESS TO USER AND TO THE PUG FILES
     req.user = freshUser ;
+    res.locals.user = freshUser;
+
     next();
 });
 
