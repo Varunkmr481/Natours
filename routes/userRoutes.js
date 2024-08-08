@@ -1,10 +1,13 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const multer = require('multer');
 const router = express.Router();
 
-//ROUTE HANDLERS
+// INCLUDING MULTER AND CONFIGURING
+const upload = multer({dest : 'public/img/users'});
 
+//ROUTE HANDLERS
 router.post('/signup', authController.signup);
 router.post('/login' , authController.login);
 router.get('/logout' , authController.logout);
@@ -16,7 +19,7 @@ router.use(authController.protect);
 
 router.patch('/updateMyPassword',authController.updatePassword);
 router.get('/me',userController.getMe,userController.getUser);
-router.patch("/updateMe" , userController.updateMe);
+router.patch("/updateMe" , upload.single('photo') , userController.updateMe);
 router.delete("/deleteMe" , userController.deleteMe);
 
 router.use(authController.restrictTo('admin'))
