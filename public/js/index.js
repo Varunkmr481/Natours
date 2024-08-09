@@ -6,7 +6,7 @@ import { updateSettings } from './updateSettings';
 // Dom elements 
 const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
-const updateDataForm = document.querySelector('.form-user-data');
+const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 
 if(loginForm){
@@ -23,17 +23,20 @@ if(loginForm){
 
 if(logOutBtn) logOutBtn.addEventListener('click', logout);
 
-if(updateDataForm){
-    updateDataForm.addEventListener('submit', e => {
+if(userDataForm){
+    userDataForm.addEventListener('submit', e => {
 
         e.preventDefault();
+
         // VALUES
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
+        const form = new FormData();
+        form.append('name', document.getElementById('name').value);
+        form.append('email', document.getElementById('email').value);
+        // files is an array , 1 file so files[0]
+        form.append('photo', document.getElementById('photo').files[0]);
+        console.log(form);
 
-        const data = {name , email};
-
-        updateSettings(data,'data');
+        updateSettings(form,'data');
     });
 };
 
