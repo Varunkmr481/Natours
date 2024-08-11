@@ -34,19 +34,19 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single('photo');
 
-exports.resizeUserPhoto = (req, res, next) => {
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if(!req.file) return next();
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`);
 
   next();
-}
+})
 
 // allowedFields here is ['name','email'] 
 
@@ -77,7 +77,7 @@ exports.updateMe = catchAsync (async (req,res,next)=>{
       // 1) Create error if user tries to post password
       if(req.body.password || req.body.confirmPassword){
         return next(new AppError("This route is not for password Updates. Please use /updateMyPassword",400))
-      }
+      };
 
       // 2) Filter out unwanted fields that are not allowed to be updated  
       const filteredBody = filterObj(req.body , 'name' , 'email');

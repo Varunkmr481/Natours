@@ -28,11 +28,41 @@ exports.UploadTourImages = upload.fields([
 // upload.single('photo') --> for single image (req.file)
 // upload.array('images',5) --> multiple images with same name (req.files)
 
-exports.resizeTourImages = (req, res, next) => {
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
 
-  console.log(req.files);
+  if(!req.files.imageCover || !req.files.images) return next();
+
+  // 1. Cover Image
+  // req.files.imageCover[0].filename = `public/img/tours/tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  const imageCoverFilename = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+  await sharp(req.files.imageCover[0].buffer)
+  .resize(2000,1333)
+  .toFormat('jpeg')
+  .jpeg({ quality : 90})
+  .toFile(`public/img/tours/${imageCoverFilename}`);
+
+  req.body.imageCover = imageCoverFilename;
+
+  // 2. Images
+  req.body.images = [];
+  
+  await Promise.all(req.files.images.map(async (file, index) => {
+
+    const filename = `tour-${req.params.id}-${Date.now()}-${index + 1}.jpeg`;
+
+    await sharp(req.files.images[index].buffer)
+      .resize(2000,1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${filename}`);
+ 
+    req.body.images.push(filename);      
+  }));
+
+  console.log(req.body);
   next();
-}
+});
 
 
 exports.aliasTopTours = (req, res, next) => {
