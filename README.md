@@ -82,23 +82,45 @@ npm run dev
 
 ## 🌐 API Endpoints
 
-1. Tours:
+## 👤 Users
 
-- GET /api/v1/tours - Get all tours.
-- POST /api/v1/tours - Create a new tour (Admin only).
-- GET /api/v1/tours/:id - Get a single tour.
+1. `GET /api/users` - Retrieve list of all users in the system  
+2. `GET /api/users/:id` - Get specific user details by ID  
+3. `POST /api/users` - Create a new user account  
+4. `PATCH /api/users/:id` - Update existing user information  
+5. `DELETE /api/users/:id` - Remove user from the system  
+6. `GET /api/users/me` - Get currently authenticated user profile  
+7. `PATCH /api/users/me` - Update current user's information  
+8. `DELETE /api/users/me` - Delete current user's account  
 
+## 🪪 Authentication
 
-2. Users:
+1. `POST /api/auth/signup` - Register a new user account  
+2. `POST /api/auth/login` - Authenticate user and get token  
+3. `POST /api/auth/forgot-password` - Request password reset email  
+4. `PATCH /api/auth/reset-password` - Reset user password with token  
+5. `PATCH /api/auth/update-password` - Update authenticated user's password  
 
-- POST /api/v1/users/signup - Register a new user.
-- POST /api/v1/users/login - Login.
-- PATCH /api/v1/users/:id - Update user details (Admin only).
+## 💬 Reviews
 
+1. `GET /api/reviews` - Get all reviews in the system  
+2. `GET /api/reviews/:id` - Get specific review details  
+3. `POST /api/reviews` - Create a new review  
+4. `PATCH /api/reviews/:id` - Update existing review  
+5. `DELETE /api/reviews/:id` - Remove a review  
 
-3. Bookings:
+## ✈️ Tours
 
-- POST /api/v1/bookings/checkout-session/:tourId - Create a Stripe checkout session.
+1. `GET /api/tours` - Get all available tours  
+2. `GET /api/tours/:id` - Get specific tour details  
+3. `GET /api/tours/radius/:distance` - Get tours within specified radius  
+4. `POST /api/tours` - Create a new tour  
+5. `PATCH /api/tours/:id` - Update tour information  
+6. `DELETE /api/tours/:id` - Remove a tour  
+7. `GET /api/tours/top-5-cheap` - Get top 5 budget-friendly tours  
+8. `GET /api/tours/stats` - Get tour statistics  
+9. `GET /api/tours/monthly-plan` - Get monthly tour plan  
+10. `GET /api/tours/unhandled` - Get unhandled tour requests
 
 ## 📌 To-Do
 
